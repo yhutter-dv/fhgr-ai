@@ -1,0 +1,212 @@
+Grundlagen von GIT
+==================
+Arbeiten mehrere Personen an einem Projekt, werden Mitstreiter die Änderungen anderer Team-Kameraden vom Server in ihr lokales Repository laden. Dies ist ein sogenannter „Pull“. Wenn jedes Team-Mitglied Änderungen vornimmt und diese per „Push“ auf den Server transferiert, kann es zu Konflikten kommen, z.B. wenn dieselben Dateien editiert wurden. Um dies besser zu handhaben, empfehlen sich Verzweigungen, sog. „Branches“ die hier in rot, blau bzw. orange dargestellt sind, und welche aus dem Hauptzweig hervorgehen, der in Git meist als „Master-Branch“, bezeichnet wird. 
+ 
+Änderungen müssen zunächst dem Git-System bekannt gemacht werden, was als „Staging“ bezeichnet wird. Nur so kann Git zwischen Änderungen an Quellcode-Dateien und unwesentlichen Änderungen an irgendwelchen temporären Dateien unterscheiden. Mit einem „Commit“ wird dann inklusive eines erklärenden Texts eine Änderung festgeschrieben. Die „Commits“ sind in der Grafik als dunkelfarbige Kugeln/Bullets dargestellt.  Ein „Commit“ repräsentiert in GIT eine für sich lauffähige Release, und auf dem Weg dorthin werden oft  mehrere lokale Dateien nacheinander verändert. Diese Zwischenstände sind aber zunächst nur lokal vorhanden und von außen nicht einsehbar. Das ist genauso wie bei isolierten Datenbank-Transaktionen, die nach außen hin als atomare Ereignisse erscheinen, aber irgendwann, übergibt man seine Änderungen mit einem „Push“ dem Repository. Es stellt sich die Frage, wie feinkörnig man „committet“. Ziel ist, dass Mitstreiter und auch der Verusracher nach einiger Zeit noch wissen, worum es inhaltlich bei der Änderung ging. So etwas wie „Zeile 53 geändert“ hilft da nicht viel. Beschreibungen wie „Druckfunktion implementiert und Menüpunkt ‚Drucken‘ eingefügt“ sind sicherlich sinnvoller. 
+
+Der Vorgang des Verlasses eines „Branches“ wird als „Checkout“ bezeichnet. Ist man also von der vorherigen Spur ausgecheckt und in einem eigenen „Branch“ kann erst mal munter drauf los committet, werden, denn im eigenen Privat-Branch drohen keine Konflikte selbst wenn man diese schon mal auf den Server pusht, um anderen Einblick in die eigene Arbeit zu geben. Die „Commits“ sind in der Grafik als dunkelfarbige Kugeln/Bullets dargestellt. Wie man in der Grafik sieht, können „Commits“ nun prallel stattfinden. Der Master-Branch repräsentiert die Produktiv-Version, die Verzweigungen müssen früher oder später auf den Master vereinigt werden, was mit einem „Merge“ bewerkstelligt wird.
+
+
+Ein einfaches Einführungsszenario zur Verwendung von GIT
+================================================================
+
+Auf einen Gitlab Repositoty (z.B. Gitlab.com User sei: assfalg):
+	•	Neues Projekt "ProjektX" anlegen.
+Auf dem Client-PC
+	•	Git muss installiert werden:
+	•	Neuer Ordner auf PC anlegen:  ProjektX
+	•	Zwei Dateien darin ablegen:
+		o	a.txt:
+			Dies ist a
+
+		o	b.txt:
+			Dies ist b
+
+Jetzt benötigt man eine Kommandozeilen-Umgebung. Auf Windows starten wir „cmd“, auf Unix/Mac ein „terminal“. Zunächst muss das lokale Repository initialisiert werden. Man geht mit „cd“ in den Ordner ProjektX und führt nun folgende Kommandozeigenbefehle aus:  
+	git init
+
+Dann muss das locale Repository mit dem Repository auf dem Server bekannt gemacht werden. Der Name „origin“ ist ein beliebiger Kurzname, hinter dem lokal die URL des Projekts und oft auch dessen Zugangsdaten für später hinterlegt werden:
+	git remote add origin https://gitlab.dhbw-heidenheim.de/assfalg/projectx.git
+
+Der nächste Schritt ist das „Staging“: Die beiden Dateien a.txt und b.txt müssen Git bekannt gegeben werden. Mit „.“ Stellt man das ganze Verzeichnis unter Git-Kontrolle:
+	git add .
+
+Nun wird mit „Commit“ eine Release erzeugt und diese auf den Server in den „Branch“ (Zweig) mit dem Namen „Master“ mit einem „Push“ überspielt. Der Name „origin“ steht dabei für die obige URL:
+	git commit -m "Erstes Aufspielen der Dateien"
+	git push -u origin master 
+
+Damit ist der aktuelle Stand auf dem Server gesichert und ab jetzt für Kollegen einsehbar.  Die Kollegen müssen aber zunächst ebenfalls sich einen Arbeitsordner „ProjektX“ einrichten und sich den Master-Branch  mit einem „Pull“ holen, um auf dem aktuellen Stand zu sein:
+	git init
+	git remote add origin https://gitlab.dhbw-heidenheim.de/assfalg/projectx.git
+	git pull origin master
+
+Nun kann einer der Kollegen z.B. die Datei b.txt ändern:
+ 			Dies ist b, aber hier ist eine Änderung.
+
+Dies ist zunächst nur eine „lokale Änderung“, die man irgendwann dem Repository bekannt machen möchste. Zuerst kommt wieder das „Staging“. Die Option „-u“ sorgt dafür, dass alle Änderungen an Dateien seit dem letzten „Commit“  herangezogen werden. Hierzu führt muss man aus: 
+	git add –u
+
+Dann erfolgt der „Commit“, und wenn absehbar ist, dass so schnell keine weiteren Änderungen mehr notwendig sind, kann auch gleich auf den Server mit einem „Push“ überspielt werden.
+	git commit -m "b.txt wurde geändert"
+	git push -u origin master
+
+Diese neue Änderung ist nun auf dem Repository des Servers im „Master-Branch“ gespeichert und nach dem „Push“ für Kollegen einsehbar bzw. mit git pull … in die eigene Arbeitsumgebung zu überführen.  
+Bislang sind wir auf dem Master-Branch geblieben. Es fanden also nur Änderungen mit zwei Commits hinterenander und keine Änderungen parallel statt. Der letzte bekannte „Commit“ einer Arbeitsumgebung wird als „HEAD“ bezeichnet. Ohne Push würde sich der Head auf dem Server und der lokale HEAD unterscheiden.
+
+Tutorials:
+	•	https://rogerdudler.github.io/git-guide/index.de.html
+	•	https://www.atlassian.com/de/git/tutorials/setting-up-a-repository
+
+
+Das Staging
+===========
+Das native „Staging“ mit „git add“ wird häufig mit der Option „-u“ genutzt. Hierbei werden automatisch die Dateien ins Staging übernommen, die geändert wurden:
+	git add –u
+
+Automatisches Staging: Die küzeste Variante des Staging ist es, dies gleich mit dem commit zu erledigen. „git commit –a“ enthält ein automatisches Staging aller modifizierter Dateien. Achtung: Das geht nur, wenn keine neuen Dateien angelegt wurden. Auch das Ändern von Dateinamen wird nicht erkannt. 
+	git commit -a -m "Kap 2. Beispiel modifiziert"
+
+Wurden Dateien umbenannt, oder sind neue Dateien hinzugekommen, muss dies GIT explizit bekannt gemacht werden. Dies wird mit der interaktiven Version von  git add  möglich  Es empfiehlt sich die Dateien z.B. mit 1-5 oder 2- usw. auswählen:
+	git add –interactive
+
+
+Ein lokales Projekt neu auf einen GIT-Server laden
+==================================================
+1. Projekt auf Gilab anlegen
+2. Auf einem Rechner, der die Dateien enthält und das zum lokalen Git-Repository werden soll, im Verzeichnis aufrufen:
+	git init
+	git remote add origin https://gitlab.dhbw-heidenheim.de/assfalg/ML-Material.git
+	git add *
+	git commit –m "Erster Upload vom lokalen Repository auf den Server"
+	git push origin master
+3. Auf dem Server: Falls die Produktiv-Version von einem Zweick „main“ repräsentiert wird, könnte ein Merge Request, notwendig werden. 
+
+ 
+Ein Projekt vom GIT-Server holen und lokal bearbeiten
+=====================================================
+Dies wird notwendig werden, wenn ein neues Team-Mitglied seine lokale Arbeitsumgebung einrichtet und zunächst alle Dateien vom Server auf den den lokalen Rechner kopiert. 
+1. Arbeitsverzeichnis anlegen
+2. Auf dem lokalen Rechner führt man im Arbeitsverzeichnis aus:
+	git init
+	git remote add origin https://gitlab.dhbw-heidenheim.de/assfalg/ML-Material.git
+	git pull origin master
+
+Ist bekannt, dass andere Teammitglieder Änderungen gepushed haben, müssen diese Änderungen ins lokale Repository geholt werden:
+	git pull origin master
+
+
+Angenommen, es wurden Dateien geändert und man möchte diese Änderung auf dem Server bekannt machen, wird ausgeführt:
+	git add -u
+	git commit -a -m "Kap 2. Beispiel modifiziert"
+	git push origin master
+
+
+Beispielszenario: Paralleles Arbeiten mehrerer Entwickler
+========================================================= 
+Wir gehen davon aus, dass Zwei Personen A und B an verschiedenen Arbeitsplatzrechnern sitzen und Teile eines gemeinsamen Projekts lokal bearbeiten. Angenommen, es gibt eine Datei x.java mit folgendem Inhalt:
+		…
+		if (x < 10) 
+			this.doSomething();
+		…
+Weiterhin wollen wir annehmen, dass A und B denselben „HEAD“ (Commit: „x.java hinzugefügt“) haben, also in jedem Fall die Datei in der gleichen Version in ihrem lokalen Repository dtehen haben und diese sehen können. 
+
+A arbeitet länger an einer Systemerweiterung  Ticket z.B: Issue #53 und verzweigt hierzu aus der Produktiv-Version. 
+	git branch iss53
+	git checkout iss53
+…Damit übernimmt er die Produktiv-Version (Master) zum aktuellen Stand und kann seine Änderungen konfliktfrei realisieren, auch wenn sich die Produktiv-Version währenddessen ändern sollte. A nimmt nun Änderungen am Code in der lokalen Datei x.java vor:
+		…
+		if (x < 10){ 
+			this.doSomething();
+			// Issue #53 (A):
+			this.doSomethingSpecial();
+		}
+		…
+ und dokumentiert dies zunächst lokal in einem Commit, der aber zunächst nur lokal bleibt und noch nicht dem Server bekannt gemacht wird:
+	git commit -a -m "Feature 1 von 2 an Issue 53"
+
+Während A immer noch an Issue #53 arbeitet, taucht ein Kundenproblem im Produktivbetrieb auf. B muss ganz schnell den Master, also die Produktiv-Version wegen einer Kleinigkeit in x.java abändern (Hotfix). Er verzweigt hierzu vom Master, damit Konflikte ausgeschlossen sind, falls C oder D den Master derweil ändern:
+	git branch hotfix
+	git checkout hotfix
+Nun ist B in seinem eigenen Zweig und macht die Hotfix-Änderung am Code in der lokalen Datei x.java
+		…
+		if (x <= 10) // Hotfix von B 
+		this.doSomething();
+		…
+Nach erfolgreichem Test wird die Änderung in den Master übernommen und mit diesem verschmolzen: 
+	git commit -a -m "Kurzfristiger Hotfix wegen... an x.x"
+	git checkout master
+	git merge hotfix
+Git führt damit die Versionen von x.java automatisch zusammen. Mit einem Push in den Master wird diese Änderung Teil der Produktiv-Version: 
+	git push origin master
+
+A ist derweil immer noch an seinem Issue #53. Er hat die Sache mit dem Hotfix gar nicht mibekommen und weiß folglich davon auch gar nichts davon, dass x.java von B geändert wurde. Er macht nochmals eine Änderung am Code in seiner lokalen Kopie der Datei x.java:
+		…
+		if (x < 10){ 
+			this.doSomething();
+			//Issue #53 (A):
+			this.doSomethingSpecial();
+			this.doSomethingVerySpecial();
+		}
+		…
+ und committet das zweite Mal in seinem eigenen Zweig „iss53“:
+	git commit -a -m "zweiter und letzter Schritt für Issue 53"
+
+Nun müssen beide Änderungen im Zweig „iss53“ mit dem Master mit einem „Merge“ vereinigt werden. Zunächst ist „Pull“ ist notwendig, um den „Hotfix“ vom Server auf den lokalen Rechner zu bekommen. Da der Hotfix von B in derselben Datei x.java stattgefunden hat, wäre das ein Konflikt, aber Git kann mit speziellen Algorithmen erkennen, welche Zeilen betroffen sind und wenn alles gut geht, kann Git die Änderungen von A und B im „Merge“ vollautomatisch so verbinden, dass „Iss53“ und der „Hotfix“ in x.java vereinigt werden: 
+	git checkout master
+	git pull origin master
+	git merge iss53
+
+Wenn hier kein Fehler kam, dann wurden die Versionen "hoffix" und "iss53" in x.java automatisch zusammengeführt. Bei einer erfolgreichen Zusammenführung ist der „Merge“wie eine Art spezieller „Commit“ anzusehen.Allgemein wird dies auch als „Merge-Commit“ bezeichnet.
+
+Speziell dieses Beispiel kann leider nicht automatisch zusammengeführt werden. Offenbar ist der Algorithmus überfordert, wenn einzelne Zeichen wie „=“ und „{„ in der selben Zeile von veschiedenen Branches zusammengeführt werden sollen. Der misslungene Merge wird von Git nun so dargestellt:
+		<<<<<<< HEAD
+		if (x <= 10) //Hotfix von B 
+		=======
+		if (x < 10) {
+		>>>>>>> iss53
+			this.doSomething();
+			// Issue #53 (A):
+			this.doSomethingSpecial();
+			this.doSomethingVerySpecial();
+		}
+So etwas kann immer passieren. Die Datei muss dann eben bei von Hand editiert werden und sollte danach in der lokalen Umgebung von A nun so aussehen:
+		…
+		if (x <= 10){ // Hotfix von B 
+			this.doSomething();
+			//Issue #53 (A):
+			this.doSomethingSpecial();
+			this.doSomethingVerySpecial();
+		}
+		…
+
+Da der obige „Merge-Commit“ nicht funktioniert hat, muss Staging, Committing sozusagen extra von Hand durchgeführt werden, denn die manuelle Zusammenführung wird nun wie eine normale einfache Änderung behandelt:
+	git commit -a -m "Manueller Merge von Iss53 und Hotfix"
+
+In jeden Fall, also auch wenn der „Merge-Commit“ automatisch funktioniert hat, muss der dieser wie jeder andere „Commit“ auch,  auf den Server gepushed werden:
+	git push origin master
+
+Zurück zu B: Er ist jetzt hinter dem HEAD des Servers und er sollte „Pull“ sagen, damit er die aktuellste Version hat:
+	git pull origin master
+Jetzt hat auch B das Issue #53 in seiner lokalen Arbeitsumgebung und sieht das Selbe wie A und damit die zusammengeführte Version, welche die Änderungen „Hotfix“ und „Issue53“ gemeinsam enthält.
+
+Auf dem Gitlab-Server wird die obige Historie festgehalten. Gitlab kann eine grafische Darstellung anzeigen, welche die einzelnen Änderungen in einer grafischen Übersicht zusammenfasst:
+
+
+Spezielle Git-Aktionen
+======================
+Überschreiben: Einen Branch (master) mit einem anderen Branch (mydev) überschreiben:
+	git chekcout master
+	git reset --hard origin/mydev
+	git push -f
+
+Zurück auf Anfang: Lokale Änderungen komplett rückgängig machen und auf den letzten commit/push zurückführen:
+	git reset --hard master
+
+ 
+Dateien aus Git ausblenden: Entwicklungsumgebungen erzeugen im Rahmen der Projektverwaltung oft allerhand temporäre Dateien, welche nicht dazu geeignet sind, von Git verwaltet zu werden. Hier besteht die Gefahr, dass es zu Merge-Konflikten kommt, oder ein missglückter automatischer Merge in Steuerdateien mit seinen Markierungen wie „<<<<<< HEAD“, „=====“ und „>>>>>>“ die Dateien unbrauchbar macht. Es empfiehlt sich dann diese Dateien aus der GIT-Überwachung auszuschließen:
+1. Datei .gitignore erstellen
+2. Darin die Dateien, Verzeichnisse, oder Dateiendungen aufzählen, welche ausgeblendet werden soll Z.B.: 
+
+		.ipynb_checkpoints
+
+Dieses Beispiel verhindert das Staging von Autosave-Dateien von Jupyter-Notebook-Dateien, wie Sie bei der Software-Entwicklung in der Programmiersprache Python verwendet werden.
