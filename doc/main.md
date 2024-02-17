@@ -27,4 +27,3 @@ footer-right: "\\small Seite \\thepage"
 # Unterrichtsnotizen
 
 ## 17.02.2024
-
