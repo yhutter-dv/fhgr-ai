@@ -81,3 +81,93 @@ Grundsätzlich kann mit der Logistischen Regression nur zwei Klassen vorausgeset
 - Mittelwert ist 0
 - Standardabweichung ist 1
 - Entspricht der **Standardnormalverteilung in der Statistik**
+
+## 06.04.2024
+
+### Entscheidungsbäume (Prüfungsrelevant)
+Klassifizieren Daten anhand Entscheidungsgrenzen (waagrechte Linien) anhand von Bediengungen. Problematisch ist es, wenn die Daten genau auf der Entscheidungsgrenze liegen, dort ist die Einteilung nicht eindeutig. Entscheidungsbaumgeneratoren sind schlussendlich nur **entropiesenkende Algorithmen**.
+
+**Entropie (Physik) - Mass für Ordnung**
+Die Entropie ist das Gegenteil von Ordnung. In der Physik spricht man von Entropie wenn man von einem Wärmeaustausch spricht. Wenn man bspw. zwei Ziegelsteine hat, einen warmen und einen kalten, dann tauschen die Ziegelsteine die Wärme aus. Wenn lange genug gewartet wird, sind die beiden Ziegelsteine gleich warm (mittlere Temperatur zwichen den zwei Ziegelsteinen). In der Regel gielt je schwerer desto mehr Wärmespeicherkapazität ist vorhanden.
+
+> Wichtig: Dieser Prozess ist nicht umkehrbar!
+
+Die Entropie wird genutzt um eine Trennlinie zu finden, wenn dieser Wert **Null erreicht** hat, gibt es eine Trennlinie. Die Trennlinie wird nicht genau bei Null gezogen, es wird ein Sicherheitsabstand einkalkuliert.
+
+> Wichtig: Entscheidungsbaumgeneratoren sind nicht binär, es können mehrere Klassen abgebildet werden
+
+* Mit einem Entscheidungsbaum können nur senkrechte und wagrechte Linien gezeichnet werden
+* Schräge Linien können mit Support Vector Machines realisiert werden
+
+### Vorteile Entscheidungsbäume
+* Einfaches und schnelles Modell
+* Daten müssen kein Scaling durchlaufen
+* Viele Klassifikationsprobleme lassen sich hiermit recht gut lösen
+
+### Nachteile Entscheidungsbäume
+* Passt sich teils stark den Daten an (Overfitting)
+* Modell antwortet nur mit Ja/Nein, keine Prozentangaben
+
+### Konfiguration von Entscheidungsbäume
+Entscheidungsbäume können anhand von folgenden Parametern konfiguriert werden:
+* Baumtiefe
+* Anzahl Datenpunkte aufgrund derer eine Entscheidung getroffen wird
+
+Wenn beispielsweise die `Baumtiefe` beschränkt wird, dann ist unter Umständen die Entscheidungsfindung nicht mehr eindeutig und es kann eine gewisse Unsicherheit bestehen.
+
+## Random Forest
+Anstelle eines Baumes werden mehrere Bäume erzeugt, hierbei werden die `Spalten auf mehrere 
+verschiedene Bäume verteilt`.
+
+### Vorteile
+* Daten müssen nicht aufwändig aufbereitet werden
+* Algorithmus kommt mit vielen Spalten klar
+
+### Nachteile
+* Modell nicht so anschaulich wie beim einzelnen Baum
+* Hoher Rechenaufwand
+
+## Naive Bayes
+Ist eine mathematische Formel zur Berechnung von **bedingten Wahrscheinlichkeiten**, d.h. Wahrscheinlichkeiten welche **unter Annahme einer bestimmten Bedingung** eintreten.
+
+### Multinomialer Bayes
+Die Warhscheinlichkeit wird mittels Auszählen ermittelt
+
+### Gaussischer Naiver Bayes
+Die zwei Werte einer Gaussverteilung ist der Mittelpunkt und der Streufaktor. Es wird geschaut in welcher Gaussische Glockenkurve der Wert liegt und dann die Wahrscheinlichkeiten berechnet.
+
+Der Naive Bayes ist bei elipsenförmigen Datenwolken gut einsetzbar, er hat aber seine Probleme mit einzelnen isolierten Clustern.
+
+### Chancenverhältnis (Odds)
+Ist die Wahrscheinlichkeit dass ein Ereignis eintritt zum Verhältnis dass es nicht eintritt.
+
+
+## Support Vector Machines (SVM)
+* Haben im Gegensatz zu Entscheidungsbäumen etc. keine Unsicherheit/Wahrscheinlichkeit (Probability)
+* Der Linienverlauf (Kernel) kann linear oder polynomial sein
+
+## Precision vs. Recall
+Wer Recall will muss eine Reduzierung der Precision hinnehmen und umgekehrt.
+
+# 13.04.2024
+
+## ROC-Kurve
+Ist eine Methode um Modelle zu vergleichen, wenn die Entscheidungsgrenze nicht mittig sondern irgendwo zwischen 1% und 10% gezogen werden würde.
+
+### Golden-Goal
+Das Golden Goal ist eine `True Positive Rate (TPR)` von 1.0 und eine `False Positive Rate (FPR)` von 0.0.
+
+### Area under Curve Score (AUC-Score)
+Flächeninhalt anhand der ROC-Kurve, der als Indikator für die Beurteilugn von Modellen, bzw. zu deren Optimierung eingesetzt werden kann.
+
+## Hyperparameter Tuning
+Kann mithilfe von `Pipelines` realisiert werden. Als Faustregel gilt:
+- 60% der Daten zum trainieren
+- 20% der Daten zum Hyperparameter optimieren
+- 20% der Daten zum testen
+
+
+
+
+
+
